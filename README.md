@@ -18,7 +18,6 @@ A lightweight, self-hosted web app for managing Wake-on-LAN across your local ne
 wol-manager/
 ├── app.py                  # Flask backend
 ├── devices.json           # Device configuration (edit this)
-├── .env                   # Environment configuration (create from .env.example)
 ├── .env.example           # Environment configuration template
 ├── requirements.txt       # Python dependencies
 ├── README.md             # This file
@@ -106,7 +105,9 @@ Available settings:
 | `FLASK_PORT` | `5000` | Server port number |
 | `FLASK_DEBUG` | `false` | Debug mode (use false in production) |
 | `PING_TIMEOUT` | `2` | Ping timeout in seconds |
-| `WOL_COOLDOWN_MINUTES` | `2` | Cooldown duration after sending WOL |
+| `WOL_COOLDOWN_MINUTES` | `2` | Cooldown duration in minutes after sending WOL |
+| `REVERSE_PROXY_COUNT`| `0` | Number of trusted reverse proxies (see Reverse Proxy section) |
+
 
 **Example .env for different scenarios:**
 
@@ -185,7 +186,15 @@ Get-NetAdapter | Select-Object Name, MacAddress
 
 ## Reverse Proxy Setup
 
-The app is designed to run behind a reverse proxy for authentication. Authentication is **not** built into the app itself.
+The app is designed to run behind a reverse proxy for authentication and SSL/TLS termination. Authentication is **not** built into the app itself.
+
+To ensure the app correctly identifies the client's IP address and protocol, you must set the `REVERSE_PROXY_COUNT` environment variable in your `.env` file.
+
+- **If you have one reverse proxy** (e.g., Nginx, Apache, Caddy), set `REVERSE_PROXY_COUNT=1`.
+- **If you have multiple layers of proxies** (e.g., Cloudflare -> Nginx), set it to the total number of proxies (e.g., `REVERSE_PROXY_COUNT=2`).
+- **If you are not using a reverse proxy**, leave it at the default of `REVERSE_PROXY_COUNT=0`.
+
+This setting is critical for security, as it controls how many `X-Forwarded-For` and `X-Forwarded-Proto` headers are trusted.
 
 ### Nginx Example
 
@@ -403,11 +412,13 @@ Health check endpoint for load balancers.
 
 ## Security Notes
 
-- **No built-in authentication**: Use reverse proxy (nginx, Apache, oauth2-proxy, etc.)
-- **No HTTPS**: Use reverse proxy for SSL/TLS
-- **No rate limiting**: Add at reverse proxy if needed
-- All inputs are escaped to prevent XSS
-- Ping and WOL operations are safe; no shell injection possible
+- **No built-in authentication**: Designed for reverse proxy (nginx, Apache, oauth2-proxy, etc.)
+- **No HTTPS**: Use a reverse proxy for SSL/TLS termination.
+- **CSRF Protection**: All state-changing requests are protected.
+- **Secure Headers**: Includes Content-Security-Policy, X-Frame-Options, and Referrer-Policy.
+- **Safe Reverse Proxy Handling**: Uses Werkzeug's `ProxyFix` to safely handle `X-Forwarded` headers when configured.
+- All inputs are escaped to prevent XSS.
+- Ping and WOL operations are safe; no shell injection possible.
 
 ## Limitations
 
@@ -419,10 +430,13 @@ Health check endpoint for load balancers.
 ## Requirements
 
 - **Python 3.9+**
-- **Flask 2.1.2+**
-- **wakeonlan 0.4.2+**
-- Network access to target PCs
-- `ping` command available (usually pre-installed)
+- **Flask**
+- **wakeonlan**
+- **python-dotenv**
+- **waitress**
+- **Flask-WTF**
+
+Dependencies are pinned in `requirements.txt` for stable, reproducible deployments.
 
 ## Development
 
