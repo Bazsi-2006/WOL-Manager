@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Gaming PC",
+    "ip": "192.168.1.50",
+    "mac": "AA:BB:CC:DD:EE:FF",
+    "gateway": "192.168.1.255",
+    "port": "9"
+  },
+  {
+    "name": "Szerver Backup PC",
+    "ip": "192.168.0.3",
+    "mac": "00:21:85:fb:66:02",
+    "gateway": "192.168.0.255",
+    "port": "9"
+  }
+]

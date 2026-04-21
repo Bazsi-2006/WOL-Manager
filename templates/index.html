@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wake-on-LAN Manager</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><span class="header-icon">🌐</span> WOL Manager</h1>
+            <button class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">
+                <span class="sun-icon">☀️</span>
+                <span class="moon-icon">🌙</span>
+            </button>
+        </div>
+
+        <div id="hosts" class="hosts-grid">
+            <div class="loading">Loading devices...</div>
+        </div>
+
+        <div class="footer">
+            <p>Polling while page is open • Auto-refresh every 3 seconds</p>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
